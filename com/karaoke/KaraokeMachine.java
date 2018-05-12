@@ -1,8 +1,8 @@
 package com.karaoke;
+import com.karaoke.model.Song;
+import com.karaoke.model.SongBook;
 
-import com.teamtreehouse.model.SongBook;
-
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 
-class KaraokeMachine {
+public class KaraokeMachine {
     private SongBook mSongBook;
     private BufferedReader mReader;
     private Map<String, String> mMenu;
@@ -24,7 +24,7 @@ class KaraokeMachine {
     }
     private String promptAction() throws IOException{
         System.out.printf("There are %d songs available. Your options are: %n", mSongBook.getSongCount());
-        for (Map.entry<String, String> option : mMenu.entrySet()){
+        for (Map.Entry<String, String> option : mMenu.entrySet()){
             System.out.printf("%s - %s %n", option.getKey(), option.getValue());
         }
         System.out.print("What do you want to do: ");
@@ -39,7 +39,9 @@ class KaraokeMachine {
                 choice = promptAction();
                 switch(choice){
                     case "add": 
-                        // TODO: add a new song
+                        Song song = promptNewSong();
+                        mSongBook.addSong(song);
+                        System.out.printf("%s added! %n%n", song);
                         break;
                     case "quit": 
                         System.out.println("Thanks for playing!");
@@ -51,9 +53,17 @@ class KaraokeMachine {
                 System.out.println("Problem with input");
                 ioe.printStackTrace();
             }
-            while(!choice.equals("quit"));
-        } while ();
+            
+        } while(!choice.equals("quit"));
     }
-    
+    private Song promptNewSong() throws IOException{
+        System.out.print("Enter the artist's name:  ");
+        String artist = mReader.readLine();
+        System.out.print("Enter the title: ");
+        String title = mReader.readLine();
+        System.out.print("Enter the video Url");
+        String videoUrl = mReader.readLine();
+        return new Song(artist, title, videoUrl);
+    } 
 
 }
