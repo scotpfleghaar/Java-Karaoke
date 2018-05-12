@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -20,6 +22,7 @@ public class KaraokeMachine {
         mReader = new BufferedReader(new InputStreamReader(System.in));
         mMenu = new HashMap<String, String>();
         mMenu.put("add", "Add a new song to the songbook");
+        mMenu.put("choose", "choose a song to sing");
         mMenu.put("quit", "Give up, Exit the program");
     }
     private String promptAction() throws IOException{
@@ -46,6 +49,12 @@ public class KaraokeMachine {
                     case "quit": 
                         System.out.println("Thanks for playing!");
                         break;
+                    case "choose":
+                        String artist = promptArtist();
+                        Song artistSong = promptSongForArtist(artist);
+                        // TODO: Add to a song Queue
+                        System.out.printf("You choose: %s %n", artistSong);
+                        break;
                     default: 
                         System.out.printf("Uknown Choice: '%s'%n%n", choice);
                 }
@@ -65,5 +74,35 @@ public class KaraokeMachine {
         String videoUrl = mReader.readLine();
         return new Song(artist, title, videoUrl);
     } 
+
+    private String promptArtist() throws IOException{
+        System.out.println("Available Artist:");
+        List<String> artists = new ArrayList<>(mSongBook.getArtists());
+        int index = promptForIndex(artists);
+        return artists.get(index);
+    }
+
+    private Song promptSongForArtist(String artist) throws IOException {
+        List<Song> songs = mSongBook.getSongsForArtist(artist);
+        List<String> songTitles = new ArrayList<>();
+        for (Song song : songs){
+            songTitles.add(song.getTitle());
+        }
+        System.out.printf("Available songs for %s: %n", artist);
+        int index = promptForIndex(songTitles);
+        return songs.get(index);
+    }
+
+    private int promptForIndex(List<String> options) throws IOException{
+        int counter = 1;
+        for (String option : options){
+            System.out.printf("%d.)  %s %n", counter, option);
+            counter++;
+        }
+        System.out.print("Your choice:   ");
+        String optionAsString = mReader.readLine();
+        int choice = Integer.parseInt(optionAsString.trim());
+        return (choice - 1);
+    }
 
 }
