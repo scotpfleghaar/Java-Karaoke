@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 
 
@@ -16,17 +18,20 @@ public class KaraokeMachine {
     private SongBook mSongBook;
     private BufferedReader mReader;
     private Map<String, String> mMenu;
+    private Queue<Song> mSongQueue;
 
     public KaraokeMachine(SongBook songBook){
         mSongBook = songBook;
         mReader = new BufferedReader(new InputStreamReader(System.in));
+        mSongQueue = new ArrayDeque<Song>();
         mMenu = new HashMap<String, String>();
         mMenu.put("add", "Add a new song to the songbook");
+        mMenu.put("play", "Play next song in the queue");
         mMenu.put("choose", "choose a song to sing");
         mMenu.put("quit", "Give up, Exit the program");
     }
     private String promptAction() throws IOException{
-        System.out.printf("There are %d songs available. Your options are: %n", mSongBook.getSongCount());
+        System.out.printf("There are %d songs available and %d in the queue. Your options are: %n", mSongBook.getSongCount(), mSongQueue.size());
         for (Map.Entry<String, String> option : mMenu.entrySet()){
             System.out.printf("%s - %s %n", option.getKey(), option.getValue());
         }
@@ -52,8 +57,11 @@ public class KaraokeMachine {
                     case "choose":
                         String artist = promptArtist();
                         Song artistSong = promptSongForArtist(artist);
-                        // TODO: Add to a song Queue
+                        mSongQueue.add(artistSong);
                         System.out.printf("You choose: %s %n", artistSong);
+                        break;
+                    case "play":
+                        playNext();
                         break;
                     default: 
                         System.out.printf("Uknown Choice: '%s'%n%n", choice);
@@ -68,9 +76,9 @@ public class KaraokeMachine {
     private Song promptNewSong() throws IOException{
         System.out.print("Enter the artist's name:  ");
         String artist = mReader.readLine();
-        System.out.print("Enter the title: ");
+        System.out.print("Enter the title:  ");
         String title = mReader.readLine();
-        System.out.print("Enter the video Url");
+        System.out.print("Enter the video Url:  ");
         String videoUrl = mReader.readLine();
         return new Song(artist, title, videoUrl);
     } 
@@ -103,6 +111,15 @@ public class KaraokeMachine {
         String optionAsString = mReader.readLine();
         int choice = Integer.parseInt(optionAsString.trim());
         return (choice - 1);
+    }
+
+    public void playNext() {
+        Song song = mSongQueue.poll();
+        if(song == null) {
+            System.out.println("Sorry there are no songs in the queue. Use Choose from the menu to add some");
+        } else {
+            System.out.printf("%n%n%n Open %s to hear %s by %s %n%n%n", song.getVideoUrl(), song.getTitle(), song.getArtist());
+        }
     }
 
 }
